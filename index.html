@@ -6,20 +6,15 @@
 	<meta name="description" content="">
 	<meta name="author" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-	<title>e-verse</title>
+	<title>PointCloud</title>
 
-	<link rel="shortcut icon" href="./resources/images/Background.ico" />
 	<link rel="stylesheet" type="text/css" href="../build/potree/potree.css">
 	<link rel="stylesheet" type="text/css" href="../libs/jquery-ui/jquery-ui.min.css">
 	<link rel="stylesheet" type="text/css" href="../libs/openlayers3/ol.css">
 	<link rel="stylesheet" type="text/css" href="../libs/spectrum/spectrum.css">
 	<link rel="stylesheet" type="text/css" href="../libs/jstree/themes/mixed/style.css">
-	<link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-      crossorigin="anonymous"
-    />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+		integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" />
 	<link rel="stylesheet" type="text/css" href="./resources/css/custom.css">
 </head>
 
@@ -28,7 +23,6 @@
 	<script src="../libs/spectrum/spectrum.js"></script>
 	<script src="../libs/jquery-ui/jquery-ui.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
-
 
 	<script src="../libs/other/BinaryHeap.js"></script>
 	<script src="../libs/tween/tween.min.js"></script>
@@ -45,20 +39,21 @@
 	<!-- INCLUDE SETTINGS HERE -->
 
 	<div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
-		<div id="potree_render_area" style="background-image: url('../resources/images/EverseBlackLogo.png');">
+		<div id="potree_render_area">
 		</div>
 		<!-- <div id="potree_sidebar_container"> </div> -->
 	</div>
 
-	<div class="info-wrapper" data-target="#info-modal" data-toggle="modal">
+	<!-- <div class="info-wrapper" data-target="#info-modal" data-toggle="modal">
 		<img src="./resources/images/infoLogo.jpeg" id="info-logo" alt="logo" />
-	</div>
+	</div> -->
 
-	<a href="https://www.e-verse.com" target={"_blank"}>
+	<!-- <a href="https://www.e-verse.com" target={"_blank"}>
 		<img src="./resources/images/EverseLogo.png" id="bottom-logo" alt="logo" />
-	</a>
+	</a> -->
 	<!-- Start Modal -->
-	<div class="modal fade" id="info-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+	<div class="modal fade" id="info-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+		aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">
 				<div class="modal-body">
@@ -100,7 +95,13 @@
 		</div>
 	</div>
 	<!-- End Modal -->
-
+	<div id="overlay">
+		<div class="form-row">
+			<label for="pointcloud-url" class="col-3">Point Cloud</label>
+			<input type="url" id="pointcloud-url" class="col-7 form-control form-control-sm">
+			<button id="pointcloud-btn" class="col-2 btn btn-sm btn-primary">Load</button>
+		</div>
+	</div>
 	<script type="module">
 		import * as THREE from '../libs/three.js/build/three.module.js';
 		import { IFCLoader } from '../libs/three.js/extra/IFCLoader.js';
@@ -123,32 +124,45 @@
 		const ambientLight = new THREE.AmbientLight(0xffffee, 0.25);
 		scene.add(ambientLight);
 
-		// Load and add point cloud to scene
-		Potree.loadPointCloud("../pointclouds/demo/cloud.js", "sigeom.sa", e => {
-			let scene = viewer.scene;
-			let pointcloud = e.pointcloud;
+		// Setup the point cloud input
+		const pointcloudUrl = $('#pointcloud-url');
+		const pointcloudBtn = $('#pointcloud-btn');
+		pointcloudBtn.on('click', function () {
+			let pointCloud = pointcloudUrl.val().trim(); 
+			if (viewer.scene.pointclouds.length > 0) {
+				viewer.scene.pointclouds.forEach( layer => viewer.scene.scenePointCloud.remove(layer))
+				viewer.scene.pointclouds = []
+			}
+			// Load and add point cloud to scene
+			Potree.loadPointCloud(`../pointclouds/${pointCloud}/cloud.js`, "sigeom.sa", e => {
+				let scene = viewer.scene;
+				let pointcloud = e.pointcloud;
 
-			let material = pointcloud.material;
-			material.size = 1;
-			material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
-			material.shape = Potree.PointShape.CIRCLE;
+				let material = pointcloud.material;
+				material.size = 1;
+				material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+				material.shape = Potree.PointShape.CIRCLE;
 
-			scene.addPointCloud(pointcloud);
+				scene.addPointCloud(pointcloud);
 
-			viewer.fitToScreen();
-			// scene.view.setView(
-			// 	[589974.341, 231698.397, 986.146],
-			// 	[589851.587, 231428.213, 715.634],
-			// );
+				viewer.fitToScreen();
+				// scene.view.setView(
+				// 	[589974.341, 231698.397, 986.146],
+				// 	[589851.587, 231428.213, 715.634],
+				// );
+			});
+
+			// Load file ifc
+			// const ifcLoader = new IFCLoader();
+			// ifcLoader.ifcManager.setWasmPath('../libs/three.js/extra/ifc/');
+			// ifcLoader.load('../pointclouds/Project1.ifc', function (model) {
+			// 	model.mesh.rotateX(Math.PI * 0.5);
+			// 	model.scale.multiplyScalar(0.3048);
+			// 	scene.add(model.mesh);
+			// });
 		});
 
-		const ifcLoader = new IFCLoader();
-		ifcLoader.ifcManager.setWasmPath('../libs/three.js/extra/ifc/');
-		ifcLoader.load('../pointclouds/Project1.ifc', function (model) {
-			model.mesh.rotateX(Math.PI * 0.5);
-			model.scale.multiplyScalar(0.3048);
-			scene.add(model.mesh);
-		});
+
 
 
 	</script>
