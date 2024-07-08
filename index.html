@@ -33,7 +33,7 @@
 	<script src="./libs/jstree/jstree.js"></script>
 	<script src="./build/potree/potree.js"></script>
 	<script src="./libs/plasio/js/laslaz.js"></script>
-
+	<!-- <script src="./src/viewer/sidebar.js"></script> -->
 
 	<!-- INCLUDE ADDITIONAL DEPENDENCIES HERE -->
 	<!-- INCLUDE SETTINGS HERE -->
@@ -41,7 +41,7 @@
 	<div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
 		<div id="potree_render_area">
 		</div>
-		<!-- <div id="potree_sidebar_container"> </div> -->
+		<div id="potree_sidebar_container"> </div>
 	</div>
 
 	<!-- <div class="info-wrapper" data-target="#info-modal" data-toggle="modal">
@@ -112,6 +112,12 @@
 		viewer.setPointBudget(1_000_000);
 		viewer.loadSettingsFromURL();
 
+		viewer.loadGUI(() => {
+			viewer.setLanguage('en');
+			$("#menu_tools").next().show();
+			viewer.toggleSidebar();
+		});
+
 		const scene = viewer.scene.scene;
 		const directionalLight1 = new THREE.DirectionalLight(0xffeeff, 0.8);
 		directionalLight1.position.set(1, 1, 1);
@@ -128,9 +134,9 @@
 		const pointcloudUrl = $('#pointcloud-url');
 		const pointcloudBtn = $('#pointcloud-btn');
 		pointcloudBtn.on('click', function () {
-			let pointCloud = pointcloudUrl.val().trim(); 
+			let pointCloud = pointcloudUrl.val().trim();
 			if (viewer.scene.pointclouds.length > 0) {
-				viewer.scene.pointclouds.forEach( layer => viewer.scene.scenePointCloud.remove(layer))
+				viewer.scene.pointclouds.forEach(layer => viewer.scene.scenePointCloud.remove(layer))
 				viewer.scene.pointclouds = []
 			}
 			// Load and add point cloud to scene
@@ -153,13 +159,14 @@
 			});
 
 			// Load file ifc
-			// const ifcLoader = new IFCLoader();
-			// ifcLoader.ifcManager.setWasmPath('../libs/three.js/extra/ifc/');
-			// ifcLoader.load('../pointclouds/Project1.ifc', function (model) {
-			// 	model.mesh.rotateX(Math.PI * 0.5);
-			// 	model.scale.multiplyScalar(0.3048);
-			// 	scene.add(model.mesh);
-			// });
+			const ifcLoader = new IFCLoader();
+			ifcLoader.ifcManager.setWasmPath('./libs/three.js/extra/ifc/');
+			ifcLoader.load('./pointclouds/Project1.ifc', function (model) {
+				model.mesh.rotateX(Math.PI * 0.5);
+				model.scale.multiplyScalar(0.3048);
+				model.mesh.position.set(0, 10, 0)
+				scene.add(model.mesh);
+			});
 		});
 
 
