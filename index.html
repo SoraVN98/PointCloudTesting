@@ -98,8 +98,13 @@
 	<div id="overlay">
 		<div class="form-row">
 			<label for="pointcloud-url" class="col-3">Point Cloud</label>
-			<input type="url" id="pointcloud-url" class="col-7 form-control form-control-sm">
-			<button id="pointcloud-btn" class="col-2 btn btn-sm btn-primary">Load</button>
+			<input type="url" id="pointcloud-url" class="col-6 form-control form-control-sm">
+			<button id="pointcloud-btn" class="col-3 btn btn-sm btn-primary">Load Pointcloud</button>
+		</div>
+		<div class="form-row">
+			<label for="pointcloud-url" class="col-3">IFC</label>
+			<input type="url" id="ifc-url" class="col-6 form-control form-control-sm">
+			<button id="ifc-btn" class="col-3 btn btn-sm btn-primary">Load IFC</button>
 		</div>
 	</div>
 	<script type="module">
@@ -115,7 +120,7 @@
 		viewer.loadGUI(() => {
 			viewer.setLanguage('en');
 			$("#menu_tools").next().show();
-			viewer.toggleSidebar();
+			// viewer.toggleSidebar();
 		});
 
 		const scene = viewer.scene.scene;
@@ -131,8 +136,15 @@
 		scene.add(ambientLight);
 
 		// Setup the point cloud input
-		const pointcloudUrl = $('#pointcloud-url');
+		const pointcloudUrl = $('#pointcloud-url').val("");
+		const ifcUrl = $('#ifc-url').val("");
 		const pointcloudBtn = $('#pointcloud-btn');
+		const ifcBtn = $('#ifc-btn');
+		var position = {
+			x: 0,
+			y: 0,
+			z: 0
+		};
 		pointcloudBtn.on('click', function () {
 			let pointCloud = pointcloudUrl.val().trim();
 			if (viewer.scene.pointclouds.length > 0) {
@@ -140,37 +152,44 @@
 				viewer.scene.pointclouds = []
 			}
 			// Load and add point cloud to scene
-			Potree.loadPointCloud(`./pointclouds/${pointCloud}/cloud.js`, "sigeom.sa", e => {
+			// Potree.loadPointCloud(`./pointclouds/${pointCloud}/cloud.js`, "sigeom.sa", e => {
+			Potree.loadPointCloud(`./pointclouds/${pointCloud}/metadata.json`, "sigeom.sa", e => {
 				let scene = viewer.scene;
 				let pointcloud = e.pointcloud;
 
 				let material = pointcloud.material;
-				material.size = 1;
+				material.size = 2;
 				material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
 				material.shape = Potree.PointShape.CIRCLE;
 
+				position.x = pointcloud.position.x
+				position.y = pointcloud.position.y
+				position.z = pointcloud.position.z
+
 				scene.addPointCloud(pointcloud);
-
 				viewer.fitToScreen();
-				// scene.view.setView(
-				// 	[589974.341, 231698.397, 986.146],
-				// 	[589851.587, 231428.213, 715.634],
-				// );
-			});
 
-			// Load file ifc
-			const ifcLoader = new IFCLoader();
-			ifcLoader.ifcManager.setWasmPath('./libs/three.js/extra/ifc/');
-			ifcLoader.load('./pointclouds/Project1.ifc', function (model) {
-				model.mesh.rotateX(Math.PI * 0.5);
-				model.scale.multiplyScalar(0.3048);
-				model.mesh.position.set(0, 10, 0)
-				scene.add(model.mesh);
 			});
 		});
+		console.log("pc", position)
 
-
-
+		ifcBtn.on('click', function () {
+			// Load file ifc
+			let ifc = ifcUrl.val().trim();
+			const ifcLoader = new IFCLoader();
+			ifcLoader.ifcManager.setWasmPath('./libs/three.js/extra/ifc/');
+			ifcLoader.load(`./ifc/${ifc}.ifc`, function (model) {
+				model.mesh.rotateX(Math.PI * 0.5);
+				model.scale.multiplyScalar(0.3408);
+				// model.mesh.position.set(
+				// 	pointcloud.position.x - 10,
+				// 	pointcloud.position.y + 5,
+				// 	pointcloud.position.z
+				// )
+				console.log("model mesh", model.mesh)
+				scene.add(model.mesh);
+			});
+		})
 
 	</script>
 
