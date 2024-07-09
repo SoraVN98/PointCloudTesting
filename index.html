@@ -176,11 +176,15 @@
 				scene.addPointCloud(pointcloud);
 				viewer.fitToScreen();
 
+
+
 			});
 		});
 
 		ifcBtn1.on('click', function () {
 			// Load file ifc
+			let measure = viewer.scene.measurements
+			console.log("measure", measure)
 			let ifc = ifcUrl1.val().trim();
 			const ifcLoader = new IFCLoader();
 			ifcLoader.ifcManager.setWasmPath('./libs/three.js/extra/ifc/');
@@ -192,7 +196,8 @@
 				// 	position.position.y + 5,
 				// 	position.position.z
 				// )
-				model.mesh.position.set(0, 15, 0)
+				let position = measure[0].points[0].position
+				model.mesh.position.copy(position)
 				let bbox = new THREE.Box3().setFromObject(model.mesh);
 				let node = new THREE.Object3D();
 				node.boundingBox = bbox;
