@@ -102,9 +102,19 @@
 			<button id="pointcloud-btn" class="col-3 btn btn-sm btn-primary">Load Pointcloud</button>
 		</div>
 		<div class="form-row">
-			<label for="pointcloud-url" class="col-3">IFC</label>
-			<input type="url" id="ifc-url" class="col-6 form-control form-control-sm">
-			<button id="ifc-btn" class="col-3 btn btn-sm btn-primary">Load IFC</button>
+			<label for="pointcloud-url" class="col-3">IFC1</label>
+			<input type="url" id="ifc1-url" class="col-6 form-control form-control-sm">
+			<button id="ifc1-btn" class="col-3 btn btn-sm btn-primary">Load IFC</button>
+		</div>
+		<div class="form-row">
+			<label for="pointcloud-url" class="col-3">IFC2</label>
+			<input type="url" id="ifc2-url" class="col-6 form-control form-control-sm">
+			<button id="ifc2-btn" class="col-3 btn btn-sm btn-primary">Load IFC</button>
+		</div>
+		<div class="form-row">
+			<label for="pointcloud-url" class="col-3">IFC3</label>
+			<input type="url" id="ifc3-url" class="col-6 form-control form-control-sm">
+			<button id="ifc3-btn" class="col-3 btn btn-sm btn-primary">Load IFC</button>
 		</div>
 	</div>
 	<script type="module">
@@ -136,10 +146,14 @@
 		scene.add(ambientLight);
 
 		// Setup the point cloud input
-		const pointcloudUrl = $('#pointcloud-url').val("");
-		const ifcUrl = $('#ifc-url').val("");
+		const pointcloudUrl = $('#pointcloud-url').val("demo");
+		const ifcUrl1 = $('#ifc1-url').val("Project1");
+		const ifcUrl2 = $('#ifc2-url').val("test2");
+		const ifcUrl3 = $('#ifc3-url').val("test3");
 		const pointcloudBtn = $('#pointcloud-btn');
-		const ifcBtn = $('#ifc-btn');
+		const ifcBtn1 = $('#ifc1-btn');
+		const ifcBtn2 = $('#ifc2-btn');
+		const ifcBtn3 = $('#ifc3-btn');
 
 		pointcloudBtn.on('click', function () {
 			let pointCloud = pointcloudUrl.val().trim();
@@ -165,9 +179,9 @@
 			});
 		});
 
-		ifcBtn.on('click', function () {
+		ifcBtn1.on('click', function () {
 			// Load file ifc
-			let ifc = ifcUrl.val().trim();
+			let ifc = ifcUrl1.val().trim();
 			const ifcLoader = new IFCLoader();
 			ifcLoader.ifcManager.setWasmPath('./libs/three.js/extra/ifc/');
 			ifcLoader.load(`./ifc/${ifc}.ifc`, function (model) {
@@ -178,7 +192,55 @@
 				// 	position.position.y + 5,
 				// 	position.position.z
 				// )
-				model.mesh.position.set(-10, 5, 0)
+				model.mesh.position.set(0, 15, 0)
+				let bbox = new THREE.Box3().setFromObject(model.mesh);
+				let node = new THREE.Object3D();
+				node.boundingBox = bbox;
+				viewer.zoomTo(node, 1, 0);
+				viewer.controls.stop();
+
+				scene.add(model.mesh);
+			});
+		})
+
+		ifcBtn2.on('click', function () {
+			// Load file ifc
+			let ifc = ifcUrl2.val().trim();
+			const ifcLoader = new IFCLoader();
+			ifcLoader.ifcManager.setWasmPath('./libs/three.js/extra/ifc/');
+			ifcLoader.load(`./ifc/${ifc}.ifc`, function (model) {
+				model.mesh.rotateX(Math.PI * 0.5);
+				model.scale.multiplyScalar(0.3408);
+				// model.mesh.position.set(
+				// 	position.position.x - 10,
+				// 	position.position.y + 5,
+				// 	position.position.z
+				// )
+				model.mesh.position.set(0, 25, 0)
+				let bbox = new THREE.Box3().setFromObject(model.mesh);
+				let node = new THREE.Object3D();
+				node.boundingBox = bbox;
+				viewer.zoomTo(node, 1, 0);
+				viewer.controls.stop();
+
+				scene.add(model.mesh);
+			});
+		})
+
+		ifcBtn3.on('click', function () {
+			// Load file ifc
+			let ifc = ifcUrl3.val().trim();
+			const ifcLoader = new IFCLoader();
+			ifcLoader.ifcManager.setWasmPath('./libs/three.js/extra/ifc/');
+			ifcLoader.load(`./ifc/${ifc}.ifc`, function (model) {
+				model.mesh.rotateX(Math.PI * 0.5);
+				model.scale.multiplyScalar(0.3408);
+				// model.mesh.position.set(
+				// 	position.position.x - 10,
+				// 	position.position.y + 5,
+				// 	position.position.z
+				// )
+				model.mesh.position.set(0, 35, 0)
 				let bbox = new THREE.Box3().setFromObject(model.mesh);
 				let node = new THREE.Object3D();
 				node.boundingBox = bbox;
