@@ -140,11 +140,7 @@
 		const ifcUrl = $('#ifc-url').val("");
 		const pointcloudBtn = $('#pointcloud-btn');
 		const ifcBtn = $('#ifc-btn');
-		var position = {
-			x: 0,
-			y: 0,
-			z: 0
-		};
+
 		pointcloudBtn.on('click', function () {
 			let pointCloud = pointcloudUrl.val().trim();
 			if (viewer.scene.pointclouds.length > 0) {
@@ -152,8 +148,8 @@
 				viewer.scene.pointclouds = []
 			}
 			// Load and add point cloud to scene
-			// Potree.loadPointCloud(`./pointclouds/${pointCloud}/cloud.js`, "sigeom.sa", e => {
-			Potree.loadPointCloud(`./pointclouds/${pointCloud}/metadata.json`, "sigeom.sa", e => {
+			Potree.loadPointCloud(`./pointclouds/${pointCloud}/cloud.js`, "sigeom.sa", e => {
+			// Potree.loadPointCloud(`./pointclouds/${pointCloud}/metadata.json`, "sigeom.sa", e => {
 				let scene = viewer.scene;
 				let pointcloud = e.pointcloud;
 
@@ -162,16 +158,12 @@
 				material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
 				material.shape = Potree.PointShape.CIRCLE;
 
-				position.x = pointcloud.position.x
-				position.y = pointcloud.position.y
-				position.z = pointcloud.position.z
-
+				pointcloud.position.set(0, 0, 0)
 				scene.addPointCloud(pointcloud);
 				viewer.fitToScreen();
 
 			});
 		});
-		console.log("pc", position)
 
 		ifcBtn.on('click', function () {
 			// Load file ifc
@@ -182,15 +174,20 @@
 				model.mesh.rotateX(Math.PI * 0.5);
 				model.scale.multiplyScalar(0.3408);
 				// model.mesh.position.set(
-				// 	pointcloud.position.x - 10,
-				// 	pointcloud.position.y + 5,
-				// 	pointcloud.position.z
+				// 	position.position.x - 10,
+				// 	position.position.y + 5,
+				// 	position.position.z
 				// )
-				console.log("model mesh", model.mesh)
+				model.mesh.position.set(-10, 5, 0)
+				let bbox = new THREE.Box3().setFromObject(model.mesh);
+				let node = new THREE.Object3D();
+				node.boundingBox = bbox;
+				viewer.zoomTo(node, 1, 0);
+				viewer.controls.stop();
+
 				scene.add(model.mesh);
 			});
 		})
-
 	</script>
 
 
