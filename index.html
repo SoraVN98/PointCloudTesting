@@ -184,7 +184,6 @@
 		ifcBtn1.on('click', function () {
 			// Load file ifc
 			let measure = viewer.scene.measurements
-			console.log("measure", measure)
 			let ifc = ifcUrl1.val().trim();
 			const ifcLoader = new IFCLoader();
 			ifcLoader.ifcManager.setWasmPath('./libs/three.js/extra/ifc/');
@@ -196,8 +195,12 @@
 				// 	position.position.y + 5,
 				// 	position.position.z
 				// )
-				let position = measure[0].points[0].position
-				model.mesh.position.copy(position)
+				if (measure.length === 0) {
+					model.mesh.position.set(0, 15, 0)
+				} else {
+					let position = measure[0].points[0].position
+					model.mesh.position.copy(position)
+				}
 				let bbox = new THREE.Box3().setFromObject(model.mesh);
 				let node = new THREE.Object3D();
 				node.boundingBox = bbox;
@@ -210,6 +213,7 @@
 
 		ifcBtn2.on('click', function () {
 			// Load file ifc
+			let measure = viewer.scene.measurements
 			let ifc = ifcUrl2.val().trim();
 			const ifcLoader = new IFCLoader();
 			ifcLoader.ifcManager.setWasmPath('./libs/three.js/extra/ifc/');
@@ -221,7 +225,12 @@
 				// 	position.position.y + 5,
 				// 	position.position.z
 				// )
-				model.mesh.position.set(0, 25, 0)
+				if (measure.length === 0) {
+					model.mesh.position.set(0, 25, 0)
+				} else {
+					let position = measure[0].points[0].position
+					model.mesh.position.copy(position)
+				}
 				let bbox = new THREE.Box3().setFromObject(model.mesh);
 				let node = new THREE.Object3D();
 				node.boundingBox = bbox;
@@ -234,6 +243,7 @@
 
 		ifcBtn3.on('click', function () {
 			// Load file ifc
+			let measure = viewer.scene.measurements
 			let ifc = ifcUrl3.val().trim();
 			const ifcLoader = new IFCLoader();
 			ifcLoader.ifcManager.setWasmPath('./libs/three.js/extra/ifc/');
@@ -245,7 +255,12 @@
 				// 	position.position.y + 5,
 				// 	position.position.z
 				// )
-				model.mesh.position.set(0, 35, 0)
+				if (measure.length === 0) {
+					model.mesh.position.set(0, 35, 0)
+				} else {
+					let position = measure[0].points[0].position
+					model.mesh.position.copy(position)
+				}
 				let bbox = new THREE.Box3().setFromObject(model.mesh);
 				let node = new THREE.Object3D();
 				node.boundingBox = bbox;
